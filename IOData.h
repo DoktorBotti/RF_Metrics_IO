@@ -1,6 +1,6 @@
 #ifndef INFORF_IODATA_H
 #define INFORF_IODATA_H
-#include "json.hpp"
+#include <json.hpp>
 #include <string>
 #include <vector>
 
@@ -22,6 +22,16 @@ struct IOData {
     static bool parse_raxml(const std::string &overview_file_path,
                             const std::string &distances_path,
                             IOData &out);
+
+  private:
+    // parsing helpers
+    static bool handle_pairwise_dst(size_t major,
+                                    size_t minor,
+                                    std::ifstream &stream,
+                                    std::vector<double> &out);
+    static bool parse_pairwise_file(const std::string &distances_path,
+                                    size_t num_taxa,
+                                    std::vector<std::vector<double>> &res);
 };
 NLOHMANN_JSON_SERIALIZE_ENUM(IOData::Metric,
                              {{IOData::MCI, "MCI"},
