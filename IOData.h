@@ -7,7 +7,7 @@
 namespace io {
 struct IOData {
 	double mean_rf_dst = 0.;
-	enum Metric { MCI, MSI, SPI, RF } split_score_calc;
+	enum Metric { MCI, MSI, SPI, RF } split_score_calc = RF;
 	double mean_modified_rf_dst = 0.;
 	std::vector<std::string> taxa_names;
 	// Invariant: numEntries = numTaxa - rowID
@@ -19,7 +19,7 @@ struct IOData {
 	bool operator==(const IOData &rhs) const;
 	bool operator!=(const IOData &rhs) const;
 
-	bool comparePairwiseDistances(const IOData& other) const;
+	bool comparePairwiseDistances(const IOData &other) const;
 
 	static bool parse_raxml(const std::string &overview_file_path,
 	                        const std::string &distances_path,
