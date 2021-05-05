@@ -45,8 +45,6 @@ bool IOData::parse_pairwise_file(const std::string &distances_path,
 	}
 	// assume UPPER triangle matrix input
 	for (size_t expect_major = 0; expect_major < num_taxa - 1; ++expect_major) {
-		// create new row
-		res.emplace_back();
 		// loop over every entry
 		for (size_t expect_minor = expect_major + 1; expect_minor < num_taxa; ++expect_minor) {
 			if (!handle_pairwise_dst(
