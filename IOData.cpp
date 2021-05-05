@@ -59,13 +59,14 @@ bool IOData::parse_pairwise_file(const std::string &distances_path,
 bool IOData::operator==(const IOData &rhs) const {
 	// compare floating points manually with relative distance measure
 
-	bool pairwise_dst_eq = comparePairwiseDistances(rhs);
-
-	return nearly_eq_floating(mean_rf_dst, rhs.mean_rf_dst) &&
-	       split_score_calc == rhs.split_score_calc &&
-	       nearly_eq_floating(mean_modified_rf_dst, rhs.mean_modified_rf_dst) &&
-	       taxa_names == rhs.taxa_names && git_revision == rhs.git_revision &&
-	       cpuInformation == rhs.cpuInformation && pairwise_dst_eq;
+	bool is_eq = comparePairwiseDistances(rhs);
+	is_eq |= nearly_eq_floating(mean_rf_dst, rhs.mean_rf_dst);
+	is_eq |= split_score_calc == rhs.split_score_calc;
+	is_eq |= nearly_eq_floating(mean_modified_rf_dst, rhs.mean_modified_rf_dst);
+	is_eq |= taxa_names == rhs.taxa_names;
+	is_eq |= git_revision == rhs.git_revision;
+	is_eq |= cpuInformation == rhs.cpuInformation;
+	return is_eq;
 }
 bool IOData::operator!=(const IOData &rhs) const {
 	return !(rhs == *this);
@@ -130,15 +131,15 @@ bool IOData::comparePairwiseDistances(const IOData &other) const {
 			equal_pairwise &= nearly_eq_floating(el[j], othEl[j]);
 		}
 		++i;
-		return equal_pairwise;
 	}
+	return equal_pairwise;
 }
 bool IOData::nearly_eq_floating(double a, double b) {
 	auto absA = std::abs(a);
 	auto absB = std::abs(b);
 	auto largest = (absA < absB) ? absB : absA;
 	auto smallest = (absA < absB) ? absA : absB;
-	return largest - smallest <= largest * static_cast<double>(FLT_EPSILON);
+	return largest - smallest <= largest * static_cast<double>(FLT_EPSILON) * 1e5;
 }
 
 } // namespace io
