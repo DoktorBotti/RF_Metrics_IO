@@ -59,34 +59,15 @@ bool IOData::parse_pairwise_file(const std::string &distances_path,
 }
 
 bool IOData::operator==(const IOData &rhs) const {
-	auto nearlyEq = [](auto a, auto b) {
-		auto absA = std::abs(a);
-		auto absB = std::abs(b);
-		auto largest = (absA < absB) ? absB : absA;
-		auto smallest = (absA < absB) ? absA : absB;
-		return largest - smallest <= largest * static_cast<double>(FLT_EPSILON);
-	};
 	// compare floating points manually with relative distance measure
-	bool equal_pairwise = pairwise_distance_mtx.size() == rhs.pairwise_distance_mtx.size();
-	if (!equal_pairwise) {
-		return false;
-	}
-	size_t i = 0;
-	for (const auto &el : pairwise_distance_mtx) {
-		const auto &othEl = rhs.pairwise_distance_mtx[i];
-		equal_pairwise &= el.size() == othEl.size();
-		if (!equal_pairwise) {
-			return false;
-		}
-		for (size_t j = 0; j < el.size(); ++j) {
-			equal_pairwise &= nearlyEq(el[j], othEl[j]);
-		}
-		++i;
-	}
-	return nearlyEq(mean_rf_dst, rhs.mean_rf_dst) && split_score_calc == rhs.split_score_calc &&
-	       nearlyEq(mean_modified_rf_dst, rhs.mean_modified_rf_dst) &&
+
+	bool pairwise_dst_eq = comparePairwiseDistances(rhs);
+
+	return nearly_eq_floating(mean_rf_dst, rhs.mean_rf_dst) &&
+	       split_score_calc == rhs.split_score_calc &&
+	       nearly_eq_floating(mean_modified_rf_dst, rhs.mean_modified_rf_dst) &&
 	       taxa_names == rhs.taxa_names && git_revision == rhs.git_revision &&
-	       cpuInformation == rhs.cpuInformation && equal_pairwise;
+	       cpuInformation == rhs.cpuInformation && pairwise_dst_eq;
 }
 bool IOData::operator!=(const IOData &rhs) const {
 	return !(rhs == *this);
@@ -134,6 +115,32 @@ bool IOData::parse_raxml(const std::string &overview_file_path,
 	bool success = parse_pairwise_file(distances_path, num_trees, out.pairwise_distance_mtx);
 
 	return success;
+}
+bool IOData::comparePairwiseDistances(const IOData &other) const {
+	bool equal_pairwise = pairwise_distance_mtx.size() == other.pairwise_distance_mtx.size();
+	if (!equal_pairwise) {
+		return false;
+	}
+	size_t i = 0;
+	for (const auto &el : pairwise_distance_mtx) {
+		const auto &othEl = other.pairwise_distance_mtx[i];
+		equal_pairwise &= el.size() == othEl.size();
+		if (!equal_pairwise) {
+			return false;
+		}
+		for (size_t j = 0; j < el.size(); ++j) {
+			equal_pairwise &= nearly_eq_floating(el[j], othEl[j]);
+		}
+		++i;
+		return equal_pairwise;
+	}
+}
+bool IOData::nearly_eq_floating(double a, double b) {
+	auto absA = std::abs(a);
+	auto absB = std::abs(b);
+	auto largest = (absA < absB) ? absB : absA;
+	auto smallest = (absA < absB) ? absA : absB;
+	return largest - smallest <= largest * static_cast<double>(FLT_EPSILON);
 }
 
 } // namespace io

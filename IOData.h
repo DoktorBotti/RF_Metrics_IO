@@ -19,6 +19,8 @@ struct IOData {
 	bool operator==(const IOData &rhs) const;
 	bool operator!=(const IOData &rhs) const;
 
+	bool comparePairwiseDistances(const IOData& other) const;
+
 	static bool parse_raxml(const std::string &overview_file_path,
 	                        const std::string &distances_path,
 	                        IOData &out);
@@ -32,6 +34,7 @@ struct IOData {
 	static bool parse_pairwise_file(const std::string &distances_path,
 	                                size_t num_taxa,
 	                                std::vector<std::vector<double>> &res);
+	static bool nearly_eq_floating(double a, double b);
 };
 NLOHMANN_JSON_SERIALIZE_ENUM(
     IOData::Metric,
