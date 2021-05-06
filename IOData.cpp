@@ -60,12 +60,12 @@ bool IOData::operator==(const IOData &rhs) const {
 	// compare floating points manually with relative distance measure
 
 	bool is_eq = comparePairwiseDistances(rhs);
-	is_eq |= nearly_eq_floating(mean_rf_dst, rhs.mean_rf_dst);
-	is_eq |= split_score_calc == rhs.split_score_calc;
-	is_eq |= nearly_eq_floating(mean_modified_rf_dst, rhs.mean_modified_rf_dst);
-	is_eq |= taxa_names == rhs.taxa_names;
-	is_eq |= git_revision == rhs.git_revision;
-	is_eq |= cpuInformation == rhs.cpuInformation;
+	is_eq &= nearly_eq_floating(mean_rf_dst, rhs.mean_rf_dst);
+	is_eq &= split_score_calc == rhs.split_score_calc;
+	is_eq &= nearly_eq_floating(mean_modified_rf_dst, rhs.mean_modified_rf_dst);
+	is_eq &= taxa_names == rhs.taxa_names;
+	is_eq &= git_revision == rhs.git_revision;
+	is_eq &= cpuInformation == rhs.cpuInformation;
 	return is_eq;
 }
 bool IOData::operator!=(const IOData &rhs) const {
