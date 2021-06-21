@@ -61,7 +61,7 @@ bool IOData::operator==(const IOData &rhs) const {
 
 	bool is_eq = comparePairwiseDistances(rhs);
 	is_eq &= nearly_eq_floating(mean_rf_dst, rhs.mean_rf_dst);
-	is_eq &= split_score_calc == rhs.split_score_calc;
+	is_eq &= metric == rhs.metric;
 	is_eq &= nearly_eq_floating(mean_modified_rf_dst, rhs.mean_modified_rf_dst);
 	is_eq &= taxa_names == rhs.taxa_names;
 	is_eq &= git_revision == rhs.git_revision;

@@ -7,7 +7,7 @@
 namespace io {
 struct IOData {
 	double mean_rf_dst = 0.;
-	enum Metric { MCI, MSI, SPI, RF } split_score_calc = RF;
+	enum Metric { MCI, MSI, SPI, RF } metric = RF;
 	double mean_modified_rf_dst = 0.;
 	std::vector<std::string> taxa_names;
 	// Invariant: numEntries = numTaxa - rowID
@@ -41,7 +41,7 @@ NLOHMANN_JSON_SERIALIZE_ENUM(
     {{IOData::MCI, "MCI"}, {IOData::MSI, "MSI"}, {IOData::SPI, "SPI"}, {IOData::RF, "RF"}});
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(IOData,
                                    mean_rf_dst,
-                                   split_score_calc,
+                                   metric,
                                    mean_modified_rf_dst,
                                    taxa_names,
                                    pairwise_distance_mtx,
