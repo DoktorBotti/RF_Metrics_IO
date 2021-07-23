@@ -1,7 +1,3 @@
-//
-// Created by tbwsl on 4/28/21.
-//
-
 #include "IOData.h"
 #include <cfloat>
 #include <fstream>
@@ -59,13 +55,12 @@ bool IOData::parse_pairwise_file(const std::string &distances_path,
 bool IOData::operator==(const IOData &rhs) const {
 	// compare floating points manually with relative distance measure
 
-	bool is_eq = comparePairwiseDistances(rhs);
-	is_eq &= nearly_eq_floating(mean_rf_dst, rhs.mean_rf_dst);
+	bool is_eq = compareScoreMatrix(rhs);
+	is_eq &= measure == rhs.measure;
+	is_eq &= nearly_eq_floating(mean, rhs.mean);
 	is_eq &= metric == rhs.metric;
-	is_eq &= nearly_eq_floating(mean_modified_rf_dst, rhs.mean_modified_rf_dst);
 	is_eq &= taxa_names == rhs.taxa_names;
-	is_eq &= git_revision == rhs.git_revision;
-	is_eq &= cpuInformation == rhs.cpuInformation;
+	is_eq &= number_of_unique_trees == rhs.number_of_unique_trees;
 	return is_eq;
 }
 bool IOData::operator!=(const IOData &rhs) const {
@@ -101,7 +96,7 @@ bool IOData::parse_raxml(const std::string &overview_file_path,
 		if (!std::regex_search(file_content, mean_dst_match, mean_rf_dst)) {
 			return false;
 		}
-		out.mean_rf_dst = stod(mean_dst_match[1].str());
+		out.mean = stod(mean_dst_match[1].str());
 
 		std::smatch num_t_mat;
 		// check if found num unique trees;
@@ -111,18 +106,18 @@ bool IOData::parse_raxml(const std::string &overview_file_path,
 		num_trees = std::stoul(num_t_mat[1].str());
 	}
 	// parse pairwise distances
-	bool success = parse_pairwise_file(distances_path, num_trees, out.pairwise_distance_mtx);
+	bool success = parse_pairwise_file(distances_path, num_trees, out.pairwise_tree_score);
 
 	return success;
 }
-bool IOData::comparePairwiseDistances(const IOData &other) const {
-	bool equal_pairwise = pairwise_distance_mtx.size() == other.pairwise_distance_mtx.size();
+bool IOData::compareScoreMatrix(const IOData &other) const {
+	bool equal_pairwise = pairwise_tree_score.size() == other.pairwise_tree_score.size();
 	if (!equal_pairwise) {
 		return false;
 	}
 	size_t i = 0;
-	for (const auto &el : pairwise_distance_mtx) {
-		const auto &othEl = other.pairwise_distance_mtx[i];
+	for (const auto &el : pairwise_tree_score) {
+		const auto &othEl = other.pairwise_tree_score[i];
 		equal_pairwise &= el.size() == othEl.size();
 		if (!equal_pairwise) {
 			return false;

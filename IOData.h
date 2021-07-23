@@ -6,12 +6,12 @@
 
 namespace io {
 struct IOData {
-	double mean_rf_dst = 0.;
-	enum Metric { MCI, MSI, SPI, RF } metric = RF;
-	double mean_modified_rf_dst = 0.;
+	double mean = 0.;
+	enum Metric { MCI, MSI, SPI, RF } metric = Metric::RF;
+	enum Measure {SIMILARITY , DISTANCE } measure = Measure::SIMILARITY;
 	std::vector<std::string> taxa_names;
 	// Invariant: numEntries = numTaxa - rowID
-	std::vector<std::vector<double>> pairwise_distance_mtx;
+	std::vector<std::vector<double>> pairwise_tree_score;
 	std::string git_revision;
 	std::string cpuInformation;
 	size_t number_of_unique_trees = 0;
@@ -19,7 +19,7 @@ struct IOData {
 	bool operator==(const IOData &rhs) const;
 	bool operator!=(const IOData &rhs) const;
 
-	bool comparePairwiseDistances(const IOData &other) const;
+	bool compareScoreMatrix(const IOData &other) const;
 
 	static bool parse_raxml(const std::string &overview_file_path,
 	                        const std::string &distances_path,
@@ -39,14 +39,18 @@ struct IOData {
 NLOHMANN_JSON_SERIALIZE_ENUM(
     IOData::Metric,
     {{IOData::MCI, "MCI"}, {IOData::MSI, "MSI"}, {IOData::SPI, "SPI"}, {IOData::RF, "RF"}});
+
+NLOHMANN_JSON_SERIALIZE_ENUM(
+    IOData::Measure,
+    {{IOData::Measure::DISTANCE, "DISTANCE"}, {IOData::Measure::SIMILARITY, "SIMILARITY"}});
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(IOData,
-                                   mean_rf_dst,
+                                   mean,
                                    metric,
-                                   mean_modified_rf_dst,
+                                   measure,
                                    taxa_names,
-                                   pairwise_distance_mtx,
+                                   pairwise_tree_score,
+                                   number_of_unique_trees,
                                    git_revision,
-                                   cpuInformation,
-                                   number_of_unique_trees);
+                                   cpuInformation);
 } // namespace io
 #endif // INFORF_IODATA_H
